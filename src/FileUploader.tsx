@@ -29,6 +29,7 @@ type Props = {
   onSelect?: (arg0: File | Array<File>) => void;
   handleChange?: (arg0: File | Array<File> | File) => void;
   onDraggingStateChange?: (dragging: boolean) => void;
+  inputRef?: RefObject<HTMLLabelElement> 
 };
 /**
  *
@@ -119,10 +120,11 @@ const FileUploader: React.FC<Props> = (props: Props): JSX.Element => {
     disabled,
     label,
     multiple,
-    onDraggingStateChange
+    onDraggingStateChange,
+    inputRef
   } = props;
   const labelRef = useRef<HTMLLabelElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const ipRef = inputRef || useRef<HTMLInputElement>(null);
   const [uploaded, setUploaded] = useState(false);
   const [currFiles, setFile] = useState<Array<File> | File | null>(null);
   const [error, setError] = useState(false);
@@ -176,8 +178,8 @@ const FileUploader: React.FC<Props> = (props: Props): JSX.Element => {
   const handleClick = (ev: any) => {
     ev.stopPropagation();
     // eslint-disable-next-line no-param-reassign
-    if (inputRef && inputRef.current) {
-      inputRef.current.click();
+    if (ipRef && ipRef.current) {
+      ipRef.current.click();
     }
   };
 
@@ -189,7 +191,7 @@ const FileUploader: React.FC<Props> = (props: Props): JSX.Element => {
   };
   const dragging = useDragging({
     labelRef,
-    inputRef,
+    ipRef,
     multiple,
     handleChanges,
     onDrop
@@ -204,7 +206,7 @@ const FileUploader: React.FC<Props> = (props: Props): JSX.Element => {
       setUploaded(true);
       setFile(fileOrFiles);
     } else {
-      if (inputRef.current) inputRef.current.value = '';
+      if (ipRef.current) ipRef.current.value = '';
       setUploaded(false);
       setFile(null);
     }
@@ -222,7 +224,7 @@ const FileUploader: React.FC<Props> = (props: Props): JSX.Element => {
         onClick={handleClick}
         onChange={handleInputChange}
         accept={acceptedExt(types)}
-        ref={inputRef}
+        ref={ipRef}
         type="file"
         name={name}
         disabled={disabled}
