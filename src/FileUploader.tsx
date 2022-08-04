@@ -5,7 +5,7 @@ import {
   UploaderWrapper
 } from './style';
 import { acceptedExt, checkType, getFileSizeMB } from './utils';
-import { useEffect, useRef, useState } from 'react';
+import { RefObject, useEffect, useRef, useState } from 'react';
 
 import DrawTypes from './DrawTypes';
 import ImageAdd from './ImageAdd';
@@ -29,7 +29,7 @@ type Props = {
   onSelect?: (arg0: File | Array<File>) => void;
   handleChange?: (arg0: File | Array<File> | File) => void;
   onDraggingStateChange?: (dragging: boolean) => void;
-  inputRef?: RefObject<HTMLLabelElement> 
+  ref?: RefObject<HTMLInputElement>;
 };
 /**
  *
@@ -121,10 +121,10 @@ const FileUploader: React.FC<Props> = (props: Props): JSX.Element => {
     label,
     multiple,
     onDraggingStateChange,
-    inputRef
+    ref
   } = props;
   const labelRef = useRef<HTMLLabelElement>(null);
-  const ipRef = inputRef || useRef<HTMLInputElement>(null);
+  const inputRef = ref || useRef<HTMLInputElement>(null);
   const [uploaded, setUploaded] = useState(false);
   const [currFiles, setFile] = useState<Array<File> | File | null>(null);
   const [error, setError] = useState(false);
@@ -178,8 +178,8 @@ const FileUploader: React.FC<Props> = (props: Props): JSX.Element => {
   const handleClick = (ev: any) => {
     ev.stopPropagation();
     // eslint-disable-next-line no-param-reassign
-    if (ipRef && ipRef.current) {
-      ipRef.current.click();
+    if (inputRef && inputRef.current) {
+      inputRef.current.click();
     }
   };
 
@@ -191,7 +191,7 @@ const FileUploader: React.FC<Props> = (props: Props): JSX.Element => {
   };
   const dragging = useDragging({
     labelRef,
-    ipRef,
+    inputRef,
     multiple,
     handleChanges,
     onDrop
@@ -206,7 +206,7 @@ const FileUploader: React.FC<Props> = (props: Props): JSX.Element => {
       setUploaded(true);
       setFile(fileOrFiles);
     } else {
-      if (ipRef.current) ipRef.current.value = '';
+      if (inputRef.current) inputRef.current.value = '';
       setUploaded(false);
       setFile(null);
     }
@@ -224,7 +224,7 @@ const FileUploader: React.FC<Props> = (props: Props): JSX.Element => {
         onClick={handleClick}
         onChange={handleInputChange}
         accept={acceptedExt(types)}
-        ref={ipRef}
+        ref={inputRef}
         type="file"
         name={name}
         disabled={disabled}
